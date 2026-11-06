@@ -4,6 +4,12 @@ An MCP server that drives a live LibreOffice Impress window over the UNO API.
 It can create slides, add text/images/shapes, reorder slides, set speaker notes,
 and export to PPTX, ODP, or PDF.
 
+## Quick install
+
+To install this, just tell your coding agent:
+
+> Install this: https://github.com/martinsuii/impress-mcp/blob/master/INSTALL.md
+
 ## Requirements
 
 - LibreOffice (`soffice`) installed
