@@ -7,15 +7,15 @@ and export to PPTX, ODP, or PDF.
 ## Requirements
 
 - LibreOffice (`soffice`) installed
-- `python3-uno` available to the system Python
+- Python UNO bindings available to the system Python (`import uno` must work)
 - Python 3.10+
 
 ## Setup
 
-The bundled `.venv` was created with system site packages so it can import
-`uno`. To recreate it:
+Create a virtualenv with access to system packages so it can import `uno`:
 
 ```bash
+cd ~/libreoffice-impress-mcp
 python3 -m venv --system-site-packages .venv
 .venv/bin/pip install -r requirements.txt
 ```
@@ -28,22 +28,40 @@ python3 -m venv --system-site-packages .venv
 
 The server speaks MCP over stdio.
 
-## Add to opencode
+## Configure your MCP client
+
+The server is a standard stdio MCP server. Configure your client with:
+
+- transport: `stdio`
+- command: `$HOME/libreoffice-impress-mcp/run.sh`
+- arguments: none
+
+Many clients use a configuration shape like this:
 
 ```json
 {
-  "mcp": {
+  "mcpServers": {
     "libreoffice-impress": {
-      "type": "local",
-      "command": ["/home/martin/libreoffice-impress-mcp/run.sh"],
-      "environment": {
+      "command": "$HOME/libreoffice-impress-mcp/run.sh",
+      "env": {
         "IMPRESS_MCP_PORT": "2002"
-      },
-      "enabled": true
+      }
     }
   }
 }
 ```
+
+Replace `$HOME` with an absolute path if your client does not expand
+environment variables. If your client prefers an interpreter and a script:
+
+```json
+{
+  "command": "$HOME/libreoffice-impress-mcp/.venv/bin/python",
+  "args": ["$HOME/libreoffice-impress-mcp/server.py"]
+}
+```
+
+See [INSTALL.md](INSTALL.md) for full setup and troubleshooting.
 
 ## Usage
 
@@ -53,10 +71,15 @@ The server speaks MCP over stdio.
 3. Use the other `impress_*` tools. Slide numbers are 1-based, distances are in
    centimetres, and colours accept `#RRGGBB`, `[r, g, b]`, or names.
 
-Set `IMPRESS_MCP_HEADLESS=1` to launch without a window. Set
-`IMPRESS_MCP_AUTOLAUNCH=1` to auto-start LibreOffice from any tool call. Other
-environment variables: `IMPRESS_MCP_HOST`, `IMPRESS_MCP_PORT`,
-`IMPRESS_MCP_PROFILE`.
+## Environment variables
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `IMPRESS_MCP_HOST` | `localhost` | UNO socket host |
+| `IMPRESS_MCP_PORT` | `2002` | UNO socket port |
+| `IMPRESS_MCP_PROFILE` | `~/.cache/libreoffice-impress-mcp/profile` | Dedicated LibreOffice profile |
+| `IMPRESS_MCP_HEADLESS` | `0` | Set to `1` to launch without a window |
+| `IMPRESS_MCP_AUTOLAUNCH` | `0` | Set to `1` to auto-launch from any tool call |
 
 ## Tools
 
